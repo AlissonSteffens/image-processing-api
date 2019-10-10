@@ -3,13 +3,13 @@ import io
 from PIL import Image 
 
 
-def to_gray_scale(img):
+def process(img, function):
     img = img.decode("utf-8").split(',')[1]
     msg = base64.b64decode(img)
     buf = io.BytesIO(msg)
     image_file = Image.open(buf)
     
-    image_file = image_file.convert('LA') # convert image to black and white
+    image_file = function(image_file)
     
     buf = io.BytesIO()
     image_file.save(buf, format="PNG")
