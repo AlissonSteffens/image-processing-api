@@ -4,21 +4,16 @@ import cv2
 
 
 def to_gray_scale(img):
-    cv_image = numpy.array(img)
-    cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
-    return Image.fromarray(cv_image)
+    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 def negative(img):
-    cv_image = numpy.array(img)
-    cv_image = cv2.bitwise_not(cv_image)
-    return Image.fromarray(cv_image)
+    return cv2.bitwise_not(img)
 
 def thumbnize(img):
     maxw = 400
     maxh = 300
-    cv_image = numpy.array(img)
-
-    h, w, channels = cv_image.shape
+    
+    h, w, channels = img.shape
     if(w>h):
         maxh = int(h* maxw/w)
     if(h>w):
@@ -26,6 +21,6 @@ def thumbnize(img):
 
     maxsize = (maxw, maxh) 
     
-    cv_image = cv2.resize(cv_image, maxsize, interpolation= cv2.INTER_AREA )
-    return Image.fromarray(cv_image)
+    cv_image = cv2.resize(img, maxsize, interpolation= cv2.INTER_AREA )
+    return cv_image
     
