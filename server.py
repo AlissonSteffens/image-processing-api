@@ -21,6 +21,16 @@ def find_faces():
     imgBase64 = request.data
     return image_conversion.process_to_json(imgBase64, face_api.find_face)
 
+@app.route('/face-rect', methods=['POST'])
+def draw_faces():
+    imgBase64 = request.data
+    return image_conversion.process(imgBase64, face_api.draw_face)
+
+@app.route('/face-points', methods=['POST'])
+def draw_face_points():
+    imgBase64 = request.data
+    return image_conversion.process(imgBase64, face_api.draw_face_points)
+
 @app.route('/thumb', methods=['POST'])
 def convert_to_thumb():
     imgBase64 = request.data
