@@ -1,6 +1,7 @@
 from PIL import Image 
 import numpy
 import cv2
+import matplotlib.pyplot as plt
 
 
 def to_gray_scale(img):

@@ -31,4 +31,8 @@ def process(img, function):
     retval, buffer = cv2.imencode('.jpg', image)
     img_str = base64.b64encode(buffer)
     return 'data:image/png;base64,' + img_str.decode('utf-8')
+
+def process_to_json(img, function):
+    output = function(data_uri_to_cv2_img(img))
+    return output 
     

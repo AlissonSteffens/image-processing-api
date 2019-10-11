@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request
 import simple_processing
 import image_conversion
+import face_api
 app = Flask(__name__)
 
 @app.route('/to-gray-scale', methods=['POST'])
@@ -14,6 +15,11 @@ def transform_to_grayscale():
 def negative_image():
     imgBase64 = request.data
     return image_conversion.process(imgBase64, simple_processing.negative)
+
+@app.route('/face', methods=['POST'])
+def find_faces():
+    imgBase64 = request.data
+    return image_conversion.process_to_json(imgBase64, face_api.find_face)
 
 @app.route('/thumb', methods=['POST'])
 def convert_to_thumb():
