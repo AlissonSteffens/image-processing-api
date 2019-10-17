@@ -44,4 +44,4 @@ def convert_to_thumb():
     return image_conversion.process(imgBase64, simple_processing.thumbnize)
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(host='0.0.0.0',port=8080)

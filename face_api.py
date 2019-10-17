@@ -1,7 +1,6 @@
 from PIL import Image 
 import numpy
 import cv2
-import matplotlib.pyplot as plt
 import simple_processing
 
 def find_face(img):
