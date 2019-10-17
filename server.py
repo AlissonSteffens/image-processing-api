@@ -3,6 +3,7 @@ from flask import request
 import simple_processing
 import image_conversion
 import face_api
+import face_landmarks
 app = Flask(__name__)
 
 @app.route('/to-gray-scale', methods=['POST'])
@@ -30,6 +31,12 @@ def draw_faces():
 def draw_face_points():
     imgBase64 = request.data
     return image_conversion.process(imgBase64, face_api.draw_face_points)
+
+
+@app.route('/face-marks', methods=['POST'])
+def draw_facelandmarks():
+    imgBase64 = request.data
+    return image_conversion.process(imgBase64, face_landmarks.find_landmarks)
 
 @app.route('/thumb', methods=['POST'])
 def convert_to_thumb():
