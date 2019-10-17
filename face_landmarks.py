@@ -3,9 +3,13 @@ import numpy as np
 import dlib
 import simple_processing
 
-def find_landmarks(img):
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor("roi_models/shape_predictor_68_face_landmarks.dat")
+detector = None
+predictor = None
+is_started = False
+
+    
+
+def find_landmarks(img, detector, predictor):    
     gray = simple_processing.to_gray_scale(img)
     faces = detector(gray)
     for face in faces:

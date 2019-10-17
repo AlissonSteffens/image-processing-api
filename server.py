@@ -1,10 +1,15 @@
 from flask import Flask
 from flask import request
+import dlib
 import simple_processing
 import image_conversion
 import face_api
 import face_landmarks
+
 app = Flask(__name__)
+
+detector = None
+predictor = None
 
 @app.route('/to-gray-scale', methods=['POST'])
 def transform_to_grayscale():
@@ -36,7 +41,7 @@ def draw_face_points():
 @app.route('/face-marks', methods=['POST'])
 def draw_facelandmarks():
     imgBase64 = request.data
-    return image_conversion.process(imgBase64, face_landmarks.find_landmarks)
+    return image_conversion.process_land(imgBase64, face_landmarks.find_landmarks, detector, predictor)
 
 @app.route('/thumb', methods=['POST'])
 def convert_to_thumb():
@@ -44,4 +49,6 @@ def convert_to_thumb():
     return image_conversion.process(imgBase64, simple_processing.thumbnize)
 
 if __name__ == '__main__':
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor("roi_models/shape_predictor_68_face_landmarks.dat")
     app.run(host='0.0.0.0',port=8080)
