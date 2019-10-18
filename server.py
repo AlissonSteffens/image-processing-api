@@ -26,5 +26,10 @@ def convert_to_thumb():
     imgBase64 = request.data
     return image_conversion.process(imgBase64, simple_processing.thumbnize)
 
+@app.route('/to-sepia', methods=['POST'])
+def convert_to_sepia():
+    imgBase64 = request.data
+    return image_conversion.process(imgBase64, simple_processing.to_sepia)
+
 if __name__ == '__main__':
     app.run(debug = True)

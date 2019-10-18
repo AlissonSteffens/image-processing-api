@@ -24,4 +24,13 @@ def thumbnize(img):
     
     cv_image = cv2.resize(img, maxsize, interpolation= cv2.INTER_AREA )
     return cv_image
+
+def to_sepia(img):
     
+    sepia = numpy.zeros((img.shape[0], img.shape[1], 3), dtype = numpy.float32)
+    sepia[:, :, 0] = img[:, :, 0] * 0.272 + img[:, :, 1] * 0.534 + img[:, :, 2] * 0.131
+    sepia[:, :, 1] = img[:, :, 0] * 0.349 + img[:, :, 1] * 0.686 + img[:, :, 2] * 0.168
+    sepia[:, :, 2] = img[:, :, 0] * 0.393 + img[:, :, 1] * 0.769 + img[:, :, 2] * 0.189
+    sepia[sepia > 255] = 255
+    ##sepia /= 255
+    return sepia
