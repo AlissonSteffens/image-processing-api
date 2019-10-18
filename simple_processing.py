@@ -25,11 +25,18 @@ def thumbnize(img):
     return cv_image
 
 def to_sepia(img):
-    
     sepia = numpy.zeros((img.shape[0], img.shape[1], 3), dtype = numpy.float32)
     sepia[:, :, 0] = img[:, :, 0] * 0.272 + img[:, :, 1] * 0.534 + img[:, :, 2] * 0.131
     sepia[:, :, 1] = img[:, :, 0] * 0.349 + img[:, :, 1] * 0.686 + img[:, :, 2] * 0.168
     sepia[:, :, 2] = img[:, :, 0] * 0.393 + img[:, :, 1] * 0.769 + img[:, :, 2] * 0.189
     sepia[sepia > 255] = 255
-    ##sepia /= 255
     return sepia
+
+def sketch(img):
+    SobelX = cv2.Sobel(img, cv2.CV_16S, 0, 1)
+    SobelX = cv2.convertScaleAbs(SobelX)
+    SobelY = cv2.Sobel(img, cv2.CV_16S, 1, 0)
+    SobelY = cv2.convertScaleAbs(SobelY)
+    sketch = cv2.add(SobelX, SobelY)
+    sketch = to_gray_scale(sketch)
+    return cv2.bitwise_not(sketch)

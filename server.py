@@ -53,6 +53,11 @@ def convert_to_sepia():
     imgBase64 = request.data
     return image_conversion.process(imgBase64, simple_processing.to_sepia)
 
+@app.route('/sketch', methods=['POST'])
+def convert_to_sketch():
+    imgBase64 = request.data
+    return image_conversion.process(imgBase64, simple_processing.sketch)
+
 if __name__ == '__main__':
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("roi_models/shape_predictor_68_face_landmarks.dat")
