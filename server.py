@@ -1,10 +1,10 @@
 from flask import Flask
 from flask import request
 import dlib
-import simple_processing
-import image_conversion
-import face_api
-import face_landmarks
+import services.simple_processing as simple_processing
+import services.image_conversion as image_conversion
+import services.face_api as face_api
+import services.face_landmarks as face_landmarks
 
 app = Flask(__name__)
 
@@ -16,37 +16,10 @@ def transform_to_grayscale():
     imgBase64 = request.data
     return image_conversion.process(imgBase64, simple_processing.to_gray_scale)
 
-
 @app.route('/negative', methods=['POST'])
 def negative_image():
     imgBase64 = request.data
     return image_conversion.process(imgBase64, simple_processing.negative)
-
-@app.route('/face', methods=['POST'])
-def find_faces():
-    imgBase64 = request.data
-    return image_conversion.process_to_json(imgBase64, face_api.find_face)
-
-@app.route('/face-rect', methods=['POST'])
-def draw_faces():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, face_api.draw_face)
-
-@app.route('/face-points', methods=['POST'])
-def draw_face_points():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, face_api.draw_face_points)
-
-
-@app.route('/face-marks', methods=['POST'])
-def draw_facelandmarks():
-    imgBase64 = request.data
-    return image_conversion.process_land(imgBase64, face_landmarks.find_landmarks, detector, predictor)
-
-@app.route('/thumb', methods=['POST'])
-def convert_to_thumb():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, simple_processing.thumbnize)
 
 @app.route('/to-sepia', methods=['POST'])
 def convert_to_sepia():
@@ -57,6 +30,34 @@ def convert_to_sepia():
 def convert_to_sketch():
     imgBase64 = request.data
     return image_conversion.process(imgBase64, simple_processing.sketch)
+
+@app.route('/thumb', methods=['POST'])
+def convert_to_thumb():
+    imgBase64 = request.data
+    return image_conversion.process(imgBase64, simple_processing.thumbnize)
+
+# Faces
+@app.route('/get-face', methods=['POST'])
+def get_face_rect():
+    imgBase64 = request.data
+    return image_conversion.process(imgBase64, face_api.get_face)
+
+@app.route('/face-rect', methods=['POST'])
+def draw_faces():
+    imgBase64 = request.data
+    return image_conversion.process(imgBase64, face_api.draw_face_rect)
+
+@app.route('/face-points', methods=['POST'])
+def draw_face_points():
+    imgBase64 = request.data
+    return image_conversion.process(imgBase64, face_api.draw_face_points)
+
+@app.route('/face-marks', methods=['POST'])
+def draw_facelandmarks():
+    imgBase64 = request.data
+    return image_conversion.process_land(imgBase64, face_landmarks.find_landmarks, detector, predictor)
+
+
 
 if __name__ == '__main__':
     detector = dlib.get_frontal_face_detector()

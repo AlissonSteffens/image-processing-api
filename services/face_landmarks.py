@@ -1,13 +1,11 @@
 import cv2
 import numpy as np
 import dlib
-import simple_processing
+import services.simple_processing as simple_processing
 
 detector = None
 predictor = None
 is_started = False
-
-    
 
 def find_landmarks(img, detector, predictor):    
     gray = simple_processing.to_gray_scale(img)
