@@ -5,6 +5,7 @@ import services.simple_processing as simple_processing
 import services.image_conversion as image_conversion
 import services.face_api as face_api
 import services.face_landmarks as face_landmarks
+import services.emotion.recognition as emotion_recognition
 
 app = Flask(__name__)
 
@@ -57,7 +58,10 @@ def draw_facelandmarks():
     imgBase64 = request.data
     return image_conversion.process_land(imgBase64, face_landmarks.find_landmarks, detector, predictor)
 
-
+@app.route('/emotion', methods=['POST'])
+def get_face_emotion():
+    imgBase64 = request.data
+    return image_conversion.process_to_json(imgBase64, emotion_recognition.get_emotion)
 
 if __name__ == '__main__':
     detector = dlib.get_frontal_face_detector()
