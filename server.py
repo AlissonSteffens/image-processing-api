@@ -8,22 +8,28 @@ import os
 import numpy as np
 import cv2
 import dlib
-
 from services.face import FaceFinder
 from services.face_landmarks import FaceLandmarker
 from services.emotion import EmotionRecognition
 from services.image_utils import ImageConverter, SimpleImageProcessing
 
 app = Flask(__name__)
-
 emotion_recognitor = EmotionRecognition()
 face_landmarker = FaceLandmarker()
 face_finder = FaceFinder()
+
 
 @app.route('/grayscale', methods=['POST'])
 def transform_to_grayscale():
     img = ImageConverter.b64_to_cv(request.data)
     img = SimpleImageProcessing.to_gray_scale(img)
+    return ImageConverter.cv_to_b64(img)
+
+
+@app.route('/sepia', methods=['POST'])
+def transform_to_sepia():
+    img = ImageConverter.b64_to_cv(request.data)
+    img = SimpleImageProcessing.to_sepia(img)
     return ImageConverter.cv_to_b64(img)
 
 
@@ -47,16 +53,6 @@ def convert_to_sketch():
     img = SimpleImageProcessing.sketch(img)
     return ImageConverter.cv_to_b64(img)
 
-# @app.route('/to-sepia', methods=['POST'])
-# def convert_to_sepia():
-#     imgBase64 = request.data
-#     return image_conversion.process(imgBase64, simple_processing.to_sepia)
-
-# @app.route('/sketch', methods=['POST'])
-# def convert_to_sketch():
-#     imgBase64 = request.data
-#     return image_conversion.process(imgBase64, simple_processing.sketch)
-
 
 @app.route('/draw-landmarks', methods=['POST'])
 def draw_facelandmarks():
@@ -70,13 +66,15 @@ def find_facelandmarks():
     img = ImageConverter.b64_to_cv(request.data)
     return face_landmarker.find_landmarks(img)
 
+
 @app.route('/api/emotion', methods=['POST'])
 def get_face_emotion():
     img = ImageConverter.b64_to_cv(request.data)
     return emotion_recognitor.get_emotion(img)
 
-# if __name__ == '__main__':
-    
+
+if __name__ == '__main__':
+    pass    
     
 
 app.run(host='0.0.0.0',port=8080, debug=True)
