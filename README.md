@@ -19,26 +19,6 @@
     a python based image processing api
   </p>
 </p>
-<!-- TABLE OF CONTENTS -->
-## Table of Contents
-
-- [Table of Contents](#table-of-contents)
-- [About The Project](#about-the-project)
-  - [Built With](#built-with)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-    - [Running locally](#running-locally)
-    - [Running locally with Docker](#running-locally-with-docker)
-    - [Running with Dockerhub](#running-with-dockerhub)
-- [Usage](#usage)
-  - [Endpoints](#endpoints)
-    - [Knowledge APi](#knowledge-api)
-    - [Edit Image](#edit-image)
-- [Academic](#academic)
-  - [Emotion Recognition Network](#emotion-recognition-network)
-
-
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
