@@ -31,7 +31,7 @@ POST to ```localhost:8080/api/landmarks``` *send the image as base64 in the requ
 ## Running with Dockerhub 
 ``` docker run -d -p 8080:8080 alissonsteffens/python-flask-opencv-dlib ```
 
-## Network
+## Emotion Recognition Network
 
 The CNN model is
 
