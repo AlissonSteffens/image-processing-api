@@ -8,72 +8,75 @@ import os
 import numpy as np
 import cv2
 import dlib
-import services.simple_processing as simple_processing
-import services.image_conversion as image_conversion
-import services.face_api as face_api
-import services.face_landmarks as face_landmarks
-import services.emotion.recognition as emotion_recognition
+
+from services.face import FaceFinder
+from services.face_landmarks import FaceLandmarker
+from services.emotion import EmotionRecognition
+from services.image_utils import ImageConverter, SimpleImageProcessing
 
 app = Flask(__name__)
 
-detector = None
-predictor = None
+emotion_recognitor = EmotionRecognition()
+face_landmarker = FaceLandmarker()
+face_finder = FaceFinder()
 
-@app.route('/to-gray-scale', methods=['POST'])
+@app.route('/grayscale', methods=['POST'])
 def transform_to_grayscale():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, simple_processing.to_gray_scale)
+    img = ImageConverter.b64_to_cv(request.data)
+    img = SimpleImageProcessing.to_gray_scale(img)
+    return ImageConverter.cv_to_b64(img)
+
 
 @app.route('/negative', methods=['POST'])
 def negative_image():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, simple_processing.negative)
+    img = ImageConverter.b64_to_cv(request.data)
+    img = SimpleImageProcessing.negative(img)
+    return ImageConverter.cv_to_b64(img)
 
-@app.route('/to-sepia', methods=['POST'])
-def convert_to_sepia():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, simple_processing.to_sepia)
-
-@app.route('/sketch', methods=['POST'])
-def convert_to_sketch():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, simple_processing.sketch)
 
 @app.route('/thumb', methods=['POST'])
 def convert_to_thumb():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, simple_processing.thumbnize)
+    img = ImageConverter.b64_to_cv(request.data)
+    img = SimpleImageProcessing.thumbnize(img)
+    return ImageConverter.cv_to_b64(img)
 
-# Faces
-@app.route('/get-face', methods=['POST'])
-def get_face_rect():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, face_api.get_face)
 
-@app.route('/face-rect', methods=['POST'])
-def draw_faces():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, face_api.draw_face_rect)
+@app.route('/sketch', methods=['POST'])
+def convert_to_sketch():
+    img = ImageConverter.b64_to_cv(request.data)
+    img = SimpleImageProcessing.sketch(img)
+    return ImageConverter.cv_to_b64(img)
 
-@app.route('/face-points', methods=['POST'])
-def draw_face_points():
-    imgBase64 = request.data
-    return image_conversion.process(imgBase64, face_api.draw_face_points)
+# @app.route('/to-sepia', methods=['POST'])
+# def convert_to_sepia():
+#     imgBase64 = request.data
+#     return image_conversion.process(imgBase64, simple_processing.to_sepia)
 
-@app.route('/face-marks', methods=['POST'])
+# @app.route('/sketch', methods=['POST'])
+# def convert_to_sketch():
+#     imgBase64 = request.data
+#     return image_conversion.process(imgBase64, simple_processing.sketch)
+
+
+@app.route('/draw-landmarks', methods=['POST'])
 def draw_facelandmarks():
-    imgBase64 = request.data
-    return image_conversion.process_land(imgBase64, face_landmarks.find_landmarks, detector, predictor)
+    img = ImageConverter.b64_to_cv(request.data)
+    img = face_landmarker.draw_landmarks(img)
+    return ImageConverter.cv_to_b64(img)
 
-@app.route('/emotion', methods=['POST'])
+
+@app.route('/api/landmarks', methods=['POST'])
+def find_facelandmarks():
+    img = ImageConverter.b64_to_cv(request.data)
+    return face_landmarker.find_landmarks(img)
+
+@app.route('/api/emotion', methods=['POST'])
 def get_face_emotion():
-    imgBase64 = request.data
-    return image_conversion.process_to_json(imgBase64, emotion_recognition.get_emotion)
+    img = ImageConverter.b64_to_cv(request.data)
+    return emotion_recognitor.get_emotion(img)
 
-if __name__ == '__main__':
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor("roi_models/shape_predictor_68_face_landmarks.dat")
+# if __name__ == '__main__':
     
     
 
-    app.run(host='0.0.0.0',port=8080)
+app.run(host='0.0.0.0',port=8080, debug=True)
