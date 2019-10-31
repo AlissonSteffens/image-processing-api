@@ -8,8 +8,15 @@ POST to ```localhost:8080/api/landmarks``` *send the image as base64 in the requ
 
 ### Endpoints
 
-*. /api/landmarks
-*. /api/emotion
+#### Knowledge APi
+* /api/landmarks
+* /api/emotion
+
+#### Edit Image
+* /grayscale
+* /negative
+* /thumb
+* /sketch
 
 
 ## Running locally
