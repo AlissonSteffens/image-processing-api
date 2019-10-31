@@ -41,4 +41,8 @@ def process_land(img, function, detector, predictor):
 def process_to_json(img, function):
     output = function(data_uri_to_cv2_img(img))
     return output 
-    
+
+
+def process_emotion(img, function, model):
+    output = function(data_uri_to_cv2_img(img),model)
+    return output 

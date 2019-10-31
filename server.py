@@ -1,5 +1,12 @@
 from flask import Flask
 from flask import request
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.models import model_from_json
+import numpy
+import os
+import numpy as np
+import cv2
 import dlib
 import services.simple_processing as simple_processing
 import services.image_conversion as image_conversion
@@ -66,4 +73,7 @@ def get_face_emotion():
 if __name__ == '__main__':
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("roi_models/shape_predictor_68_face_landmarks.dat")
+    
+    
+
     app.run(host='0.0.0.0',port=8080)
