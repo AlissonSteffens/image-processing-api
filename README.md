@@ -74,6 +74,8 @@ POST to ```localhost:8080/api/landmarks``` *send the image as base64 in the requ
 * /thumb
 * /sketch
 
+#### Other
+* /face (crop face)
 
 ## Academic
 

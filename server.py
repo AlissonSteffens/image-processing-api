@@ -53,6 +53,12 @@ def convert_to_sketch():
     img = SimpleImageProcessing.sketch(img)
     return ImageConverter.cv_to_b64(img)
 
+@app.route('/face', methods=['POST'])
+def get_face():
+    img = ImageConverter.b64_to_cv(request.data)
+    img = face_finder.get_face_48(img)
+    return ImageConverter.cv_to_b64(img)
+
 
 @app.route('/draw-landmarks', methods=['POST'])
 def draw_facelandmarks():
