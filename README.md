@@ -35,7 +35,6 @@ A python based image processing api.
 * [Flask](https://github.com/pallets/flask)
 * [Tensorflow](https://github.com/tensorflow/tensorflow)
 * [Keras](https://github.com/keras-team/keras)
-* [dlib](https://github.com/davisking/dlib)
 * [OpenCV](https://github.com/opencv/opencv)
 * [numpy](https://github.com/numpy/numpy)
 * [matplotlib](https://github.com/matplotlib/matplotlib)
@@ -50,37 +49,17 @@ To get a local copy up and running follow these simple steps.
 #### Running locally
 * Install de [dependencies](requirements.txt)
 * Run ``` python server.py ``` 
-  
-#### Running locally with Docker
-
-* Build ``` docker build . -t image-processing-api```
-* Run ``` docker run -p 8080:8080 image-processing-api ```
-
-#### Running with Dockerhub 
-``` docker run -d -p 8080:8080 alissonsteffens/python-flask-opencv-dlib ```
 
 ## Usage
-POST to ```localhost:8080/api/landmarks``` *send the image as base64 in the request body*
+GET to ```localhost:8080/api/marks?image=https://raw.githubusercontent.com/AlissonSteffens/image-processing-api/master/demo/lenna.jpg```
 
 ### Endpoints
 
-#### Knowledge APi
-* /api/landmarks
-* /api/emotion
-
-#### Edit Image
-* /grayscale
-* /negative
-* /thumb
-* /sketch
+#### Knowledge API
+* **/api/faces** - face rects of image
+* **/api/marks** - 68 main landmarks on faces
 
 #### Other
-* /face (crop face)
+* **/draw-marks** - 68 main landmarks on faces
 
-## Academic
-
-### Emotion Recognition Network
-
-The CNN model is
-
-![](demo/model.png)
+Alternatively you can use "size=x" to set marker size.

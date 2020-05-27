@@ -1,83 +1,76 @@
-from flask import Flask
+from flask import Flask, send_file
 from flask import request
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.models import model_from_json
-import numpy
 import os
 import numpy as np
 import cv2
-import dlib
-from services.face import FaceFinder
-from services.face_landmarks import FaceLandmarker
-from services.emotion import EmotionRecognition
-from services.image_utils import ImageConverter, SimpleImageProcessing
+import urllib.request as urllib
+from io import BytesIO
+from PIL import Image
+
+from services.faces import FaceFinder
+from services.landmarks import LandmarkFinder
+
+# from services.emotion import EmotionRecognition
+# from services.image_utils import ImageConverter, SimpleImageProcessing
 
 app = Flask(__name__)
-emotion_recognitor = EmotionRecognition()
-face_landmarker = FaceLandmarker()
+
+# emotion_recognitor = EmotionRecognition()
+# face_landmarker = FaceLandmarker()
 face_finder = FaceFinder()
+landmark_finder =  LandmarkFinder()
 
+def url_to_image(url):
+	resp = urllib.urlopen(url)
+	image = np.asarray(bytearray(resp.read()), dtype="uint8")
+	image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+	return image
 
-@app.route('/grayscale', methods=['POST'])
-def transform_to_grayscale():
-    img = ImageConverter.b64_to_cv(request.data)
-    img = SimpleImageProcessing.to_gray_scale(img)
-    return ImageConverter.cv_to_b64(img)
+def serve_pil_image(img):
+    pil_img = Image.fromarray(img.astype('uint8'), 'RGB')
+    img_io = BytesIO()
+    pil_img.save(img_io, 'JPEG', quality=70)
+    img_io.seek(0)
+    return img_io
 
-
-@app.route('/sepia', methods=['POST'])
-def transform_to_sepia():
-    img = ImageConverter.b64_to_cv(request.data)
-    img = SimpleImageProcessing.to_sepia(img)
-    return ImageConverter.cv_to_b64(img)
-
-
-@app.route('/negative', methods=['POST'])
-def negative_image():
-    img = ImageConverter.b64_to_cv(request.data)
-    img = SimpleImageProcessing.negative(img)
-    return ImageConverter.cv_to_b64(img)
-
-
-@app.route('/thumb', methods=['POST'])
-def convert_to_thumb():
-    img = ImageConverter.b64_to_cv(request.data)
-    img = SimpleImageProcessing.thumbnize(img)
-    return ImageConverter.cv_to_b64(img)
-
-
-@app.route('/sketch', methods=['POST'])
-def convert_to_sketch():
-    img = ImageConverter.b64_to_cv(request.data)
-    img = SimpleImageProcessing.sketch(img)
-    return ImageConverter.cv_to_b64(img)
-
-@app.route('/face', methods=['POST'])
+@app.route('/api/face', methods=['GET'])
 def get_face():
-    img = ImageConverter.b64_to_cv(request.data)
-    img = face_finder.get_face_48(img)
-    return ImageConverter.cv_to_b64(img)
+    img_url = request.args['image']
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image)
+    return faces
+
+@app.route('/api/marks', methods=['GET'])
+def get_marks():
+    img_url = request.args['image']
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image,as_np = True)
+    marks = landmark_finder.find_landmarks(image, faces)
+    return marks
+
+@app.route('/draw-marks', methods=['GET'])
+def draw_marks():
+    if 'image' in request.args:
+        img_url = request.args['image']
+    else:
+        img_url = 'https://raw.githubusercontent.com/AlissonSteffens/image-processing-api/master/demo/lenna.jpg'
+
+    if 'size' in request.args:
+        size = int(request.args['size'])
+    else:
+        size = 1
 
 
-@app.route('/draw-landmarks', methods=['POST'])
-def draw_facelandmarks():
-    img = ImageConverter.b64_to_cv(request.data)
-    img = face_landmarker.draw_landmarks(img)
-    return ImageConverter.cv_to_b64(img)
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image,as_np = True)
+    marks = landmark_finder.find_landmarks(image, faces,as_np = True)
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    for landmark in marks:
+        for x,y in landmark[0]:
+            cv2.circle(image_rgb, (x, y), 1, (255, 255, 255), size)
 
-
-@app.route('/api/landmarks', methods=['POST'])
-def find_facelandmarks():
-    img = ImageConverter.b64_to_cv(request.data)
-    return face_landmarker.find_landmarks(img)
-
-
-@app.route('/api/emotion', methods=['POST'])
-def get_face_emotion():
-    img = ImageConverter.b64_to_cv(request.data)
-    return emotion_recognitor.get_emotion(img)
-
+    return send_file(serve_pil_image(image_rgb),mimetype='image/jpeg')
+    
 
 if __name__ == '__main__':
     pass    
