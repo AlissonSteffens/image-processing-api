@@ -40,6 +40,29 @@ def get_face():
     faces = face_finder.find_faces(image)
     return faces
 
+@app.route('/face', methods=['GET'])
+def get_face_rect():
+    if 'image' in request.args:
+        img_url = request.args['image']
+    else:
+        img_url = 'https://raw.githubusercontent.com/AlissonSteffens/image-processing-api/master/demo/lenna.jpg'
+
+    image = url_to_image(img_url)
+    
+    faces = face_finder.find_faces(image, as_np = True)
+
+    (x,y,w,h) = faces[0]
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    crop_img = image_rgb[y:y+h, x:x+w]
+
+    if 'size' in request.args:
+        size = int(request.args['size'])
+        final_image = cv2.resize(crop_img,(size,size))
+        return send_file(serve_pil_image(final_image),mimetype='image/jpeg')
+    else:
+        return send_file(serve_pil_image(crop_img),mimetype='image/jpeg')
+    
+
 @app.route('/api/marks', methods=['GET'])
 def get_marks():
     img_url = request.args['image']
@@ -48,18 +71,17 @@ def get_marks():
     marks = landmark_finder.find_landmarks(image, faces)
     return marks
 
-@app.route('/draw-marks', methods=['GET'])
+@app.route('/marks', methods=['GET'])
 def draw_marks():
     if 'image' in request.args:
         img_url = request.args['image']
     else:
         img_url = 'https://raw.githubusercontent.com/AlissonSteffens/image-processing-api/master/demo/lenna.jpg'
 
-    if 'size' in request.args:
-        size = int(request.args['size'])
+    if 'marker_size' in request.args:
+        marker_size = int(request.args['marker_size'])
     else:
-        size = 1
-
+        marker_size = 1
 
     image = url_to_image(img_url)
     faces = face_finder.find_faces(image,as_np = True)
@@ -67,7 +89,7 @@ def draw_marks():
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     for landmark in marks:
         for x,y in landmark[0]:
-            cv2.circle(image_rgb, (x, y), 1, (255, 255, 255), size)
+            cv2.circle(image_rgb, (x, y), 1, (255, 255, 255), marker_size)
 
     return send_file(serve_pil_image(image_rgb),mimetype='image/jpeg')
     

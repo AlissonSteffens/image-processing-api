@@ -60,6 +60,9 @@ GET to ```localhost:8080/api/marks?image=https://raw.githubusercontent.com/Aliss
 * **/api/marks** - 68 main landmarks on faces
 
 #### Other
-* **/draw-marks** - 68 main landmarks on faces
+* **/marks** - 68 main landmarks on faces
+* **/face** - return the most important face as a image
 
-Alternatively you can use "size=x" to set marker size.
+Alternatively you can use:
+  "marker_size=x" to set marker size.
+  "size=x" to set image size.
