@@ -6,8 +6,7 @@ class LandmarkFinder:
     def __init__(self):
         self.detector  = cv2.face.createFacemarkLBF()
         self.detector.loadModel('models/lbfmodel.yaml')
-    
-    
+
     def find_landmarks(self, image, faces, as_np = False):
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_gray = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)

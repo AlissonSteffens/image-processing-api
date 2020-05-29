@@ -14,7 +14,7 @@ class FaceFinder:
 
         if as_np:
             return faces
-
+        
         tb = []
         for f in faces:
             (x,y,w,h) = f

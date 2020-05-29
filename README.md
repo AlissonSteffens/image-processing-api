@@ -65,4 +65,4 @@ GET to ```localhost:8080/api/marks?image=https://raw.githubusercontent.com/Aliss
 
 Alternatively you can use:
   "marker_size=x" to set marker size.
-  "size=x" to set image size.
+  "image_size=x" to set image size.
