@@ -9,6 +9,7 @@ from PIL import Image
 
 from services.faces import FaceFinder
 from services.landmarks import LandmarkFinder
+from services.focus import FocusFinder
 
 # from services.emotion import EmotionRecognition
 # from services.image_utils import ImageConverter, SimpleImageProcessing
@@ -19,6 +20,7 @@ app = Flask(__name__)
 # face_landmarker = FaceLandmarker()
 face_finder = FaceFinder()
 landmark_finder =  LandmarkFinder()
+focus_finder = FocusFinder()
 
 def url_to_image(url):
 	resp = urllib.urlopen(url)
@@ -65,7 +67,6 @@ def get_face_rect():
 
 @app.route('/api/marks', methods=['GET'])
 def get_marks():
-    size = 100
     img_url = request.args['image']
 
     image = url_to_image(img_url)
@@ -74,6 +75,70 @@ def get_marks():
     marks = landmark_finder.find_landmarks(image, faces)
 
     return marks
+
+@app.route('/api/simple-marks', methods=['GET'])
+def get_simp_marks():
+    img_url = request.args['image']
+
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image,as_np = True)
+    marks = landmark_finder.find_simple_landmarks(image, faces)
+
+    return marks
+
+@app.route('/api/direction', methods=['GET'])
+def get_direction():
+    img_url = request.args['image']
+
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image,as_np = True)
+    marks = landmark_finder.find_simple_landmarks(image, faces,as_np = True)
+    direction = focus_finder.find_direction(marks)
+
+    return direction
+
+
+@app.route('/simple-marks', methods=['GET'])
+def draw_simple_marks():
+    if 'image' in request.args:
+        img_url = request.args['image']
+    else:
+        img_url = 'https://raw.githubusercontent.com/AlissonSteffens/image-processing-api/master/demo/lenna.jpg'
+
+    if 'marker_size' in request.args:
+        marker_size = int(request.args['marker_size'])
+    else:
+        marker_size = 1
+
+    if 'image_size' in request.args:
+        image_size = int(request.args['image_size'])
+        resize = True
+    else:
+        resize = False
+
+    
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image,as_np = True)
+    (xf,yf,wf,hf) = faces[0]
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    crop_img = np.zeros((int(wf*1.1),int(hf*1.1),3), np.uint8)
+
+
+    marks = landmark_finder.find_simple_landmarks(image, faces,as_np = True)
+
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    landmark = marks[0]
+    if resize:
+        marker_size = int(wf/(image_size/2))
+    for x,y in landmark:
+        cv2.circle(crop_img, (int(x-xf), int(y-yf)), 1, (255, 255, 255), marker_size)
+
+    if resize:
+        crop_img = cv2.resize(crop_img,(image_size,image_size))
+
+    return send_file(serve_pil_image(crop_img),mimetype='image/jpeg')
+
 
 @app.route('/marks', methods=['GET'])
 def draw_marks():
@@ -116,6 +181,29 @@ def draw_marks():
 
     return send_file(serve_pil_image(crop_img),mimetype='image/jpeg')
 
+@app.route('/simple-face-marks', methods=['GET'])
+def draw_simple_face_marks():
+    if 'image' in request.args:
+        img_url = request.args['image']
+    else:
+        img_url = 'https://raw.githubusercontent.com/AlissonSteffens/image-processing-api/master/demo/lenna.jpg'
+
+    if 'marker_size' in request.args:
+        marker_size = int(request.args['marker_size'])
+    else:
+        marker_size = 1
+
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image,as_np = True)
+    marks = landmark_finder.find_simple_landmarks(image, faces,as_np = True)
+
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    for landmark in marks:
+        for x,y in landmark:
+            cv2.circle(image_rgb, (x, y), 1, (255, 255, 255), marker_size)
+
+    return send_file(serve_pil_image(image_rgb),mimetype='image/jpeg')  
+
 @app.route('/face-marks', methods=['GET'])
 def draw_face_marks():
     if 'image' in request.args:
@@ -134,7 +222,7 @@ def draw_face_marks():
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     for landmark in marks:
         for x,y in landmark[0]:
-            cv2.circle(image_rgb, (x, y), 1, (255, 255, 255), marker_size)
+            cv2.circle(image_rgb, (x, y), 1, (255, 0, 0), marker_size)
 
     return send_file(serve_pil_image(image_rgb),mimetype='image/jpeg')  
 
