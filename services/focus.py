@@ -42,20 +42,20 @@ class FocusFinder:
             left = fuzz.membership.gaussmf(percentual_lateral,1,.25)
             
             if right > center and right > left:
-                direction_h = 'Esquerda'
+                direction_h = 'Right'
             else:
                 if left > center and left > right:
-                    direction_h = 'Direita'
+                    direction_h = 'Left'
                 else:
-                    direction_h = 'Frente'
+                    direction_h = 'Center'
             
             if up > middle and up > down:
-                direction_v = 'Cima'
+                direction_v = 'Up'
             else:
                 if down > middle and down > up:
-                    direction_v = 'Baixo'
+                    direction_v = 'Down'
                 else:
-                    direction_v = 'Meio' 
+                    direction_v = 'Middle' 
 
             tb.append({
                 'distances':{
