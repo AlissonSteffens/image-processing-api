@@ -59,6 +59,7 @@ GET to ```localhost:8080/api/marks?image=https://raw.githubusercontent.com/Aliss
 * **/api/faces** - face rects of image
 * **/api/marks** - 68 main landmarks on faces
 * **/api/direction** - information about here is the person looking 
+* **/api/emotion** - predicts the person emotion 
 
 #### Other
 * **/marks** - 68 main landmarks on faces

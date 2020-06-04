@@ -31,9 +31,9 @@ class FocusFinder:
             percentual_vertical = ((dist_y_o_esq+dist_y_o_dir)/2)/dist_queixo
             
 
-            up = fuzz.membership.gaussmf(percentual_vertical,0,.25)
-            middle = fuzz.membership.gaussmf(percentual_vertical,.8, .15)
-            down = fuzz.membership.gaussmf(percentual_vertical,1,.25)
+            up = fuzz.membership.gaussmf(percentual_vertical,0,.3)
+            middle = fuzz.membership.gaussmf(percentual_vertical,.66, .2)
+            down = fuzz.membership.gaussmf(percentual_vertical,1.33,.25)
 
             
 
@@ -42,20 +42,20 @@ class FocusFinder:
             left = fuzz.membership.gaussmf(percentual_lateral,1,.25)
             
             if right > center and right > left:
-                direction_h = 'Right'
+                direction_h = 'Direita'
             else:
                 if left > center and left > right:
-                    direction_h = 'Left'
+                    direction_h = 'Esquerda'
                 else:
-                    direction_h = 'Center'
+                    direction_h = 'Frente'
             
             if up > middle and up > down:
-                direction_v = 'Up'
+                direction_v = 'Cima'
             else:
                 if down > middle and down > up:
-                    direction_v = 'Down'
+                    direction_v = 'Baixo'
                 else:
-                    direction_v = 'Middle' 
+                    direction_v = 'Reto' 
 
             tb.append({
                 'distances':{

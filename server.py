@@ -10,6 +10,7 @@ from PIL import Image
 from services.faces import FaceFinder
 from services.landmarks import LandmarkFinder
 from services.focus import FocusFinder
+from services.emotion import EmotionRecognition
 
 # from services.emotion import EmotionRecognition
 # from services.image_utils import ImageConverter, SimpleImageProcessing
@@ -21,6 +22,7 @@ app = Flask(__name__)
 face_finder = FaceFinder()
 landmark_finder =  LandmarkFinder()
 focus_finder = FocusFinder()
+emotion_recognitor = EmotionRecognition()
 
 def url_to_image(url):
 	resp = urllib.urlopen(url)
@@ -34,6 +36,25 @@ def serve_pil_image(img):
     pil_img.save(img_io, 'JPEG', quality=70)
     img_io.seek(0)
     return img_io
+
+@app.route('/api/emotion', methods=['GET'])
+def get_emotion():
+    size = 48
+    img_url = request.args['image']
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image)
+    faces = face_finder.find_faces(image, as_np = True)
+
+    (x,y,w,h) = faces[0]
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    crop_img = image_rgb[y:y+h, x:x+w]
+
+    final_image = cv2.resize(crop_img,(size,size))
+
+    emotion = emotion_recognitor.get_emotion(final_image)
+
+    return emotion
+
 
 @app.route('/api/face', methods=['GET'])
 def get_face():
