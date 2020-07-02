@@ -29,4 +29,7 @@ class EmotionRecognition:
         for l in self.labels:
             dicti[l] = str("{:.5f}".format((yhat[0][count])))
             count+=1 
+        
+        dicti['main_emotion']= self.labels[np.argmax(yhat[0])]
+
         return dicti
