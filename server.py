@@ -243,7 +243,7 @@ def draw_face_marks():
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     for landmark in marks:
         for x,y in landmark[0]:
-            cv2.circle(image_rgb, (x, y), 1, (255, 0, 0), marker_size)
+            cv2.circle(image_rgb, (x, y), 1, (255, 255, 255), marker_size)
 
     return send_file(serve_pil_image(image_rgb),mimetype='image/jpeg')  
 
