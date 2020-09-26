@@ -5,6 +5,6 @@ matplotlib==3.0.3
 numpy==1.17.2
 opencv-python==4.1.0.25
 Pillow>=6.2.0
-tensorflow==1.15.2
+tensorflow==1.15.4
 keras==2.2.4
 scikit-fuzzy>=0.1
