@@ -2,6 +2,7 @@ import cv2
 import json
 import numpy as np
 
+
 class FaceFinder:
     def __init__(self):
         self.detector = cv2.CascadeClassifier('models/haar/haarcascade_frontalface_default.xml')

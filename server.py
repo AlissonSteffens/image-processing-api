@@ -184,18 +184,18 @@ def draw_marks():
     faces = face_finder.find_faces(image,as_np = True)
     (xf,yf,wf,hf) = faces[0]
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    crop_img = np.zeros((int(wf*1.1),int(hf*1.1),3), np.uint8)
+    crop_img = np.zeros((int(image_rgb.shape[0]),int(image_rgb.shape[1]),3), np.uint8)
 
 
     marks = landmark_finder.find_landmarks(image, faces,as_np = True)
 
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    landmark = marks[0]
+    landmark = marks
     if resize:
         marker_size = int(wf/(image_size/2))
-    for x,y in landmark[0]:
-        cv2.circle(crop_img, (int(x-xf), int(y-yf)), 1, (255, 255, 255), marker_size)
+    for x,y,z in landmark:
+        cv2.circle(crop_img, (int(x), int(y)), 1, (255, 255, 255), marker_size)
 
     if resize:
         crop_img = cv2.resize(crop_img,(image_size,image_size))
@@ -241,9 +241,11 @@ def draw_face_marks():
     faces = face_finder.find_faces(image,as_np = True)
     marks = landmark_finder.find_landmarks(image, faces,as_np = True)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    for landmark in marks:
-        for x,y in landmark[0]:
-            cv2.circle(image_rgb, (x, y), 1, (255, 255, 255), marker_size)
+    
+    for x,y,z in marks:
+        pox = int(x)
+        poy=  int(y) 
+        cv2.circle(image_rgb, (pox, poy), 1, (255, 255, 255), marker_size)
 
     return send_file(serve_pil_image(image_rgb),mimetype='image/jpeg')  
 
