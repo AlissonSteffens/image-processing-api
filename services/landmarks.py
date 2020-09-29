@@ -8,7 +8,7 @@ import time
 
 class LandmarkFinder:
 
-    def find_landmarks(self, image, faces, as_np = False):
+    def find_landmarks(self, image, as_np = False):
         interpreter = tf.lite.Interpreter(model_path='models/face_landmark.tflite')
         interpreter.allocate_tensors()
 
@@ -20,7 +20,7 @@ class LandmarkFinder:
         floating_model = input_details[0]['dtype'] == np.float32
         height = input_details[0]['shape'][1]
         width = input_details[0]['shape'][2]
-
+        print(width,height)
         img = cv2.resize(image,(width, height))
 
         # add N dim
@@ -39,9 +39,10 @@ class LandmarkFinder:
         results = np.squeeze(output_data)
 
         results.shape = (468,3)
-        for i in range(len(results)):
-            results[i][0] = results[i][0]*(image.shape[1]/width)
-            results[i][1] = results[i][1]*(image.shape[0]/height)
+
+        # for i in range(len(results)):
+        #     results[i][0] = results[i][0]*(image.shape[1]/width)
+        #     results[i][1] = results[i][1]*(image.shape[0]/height)
         if as_np:
             return results
 

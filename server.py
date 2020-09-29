@@ -202,29 +202,6 @@ def draw_marks():
 
     return send_file(serve_pil_image(crop_img),mimetype='image/jpeg')
 
-@app.route('/simple-face-marks', methods=['GET'])
-def draw_simple_face_marks():
-    if 'image' in request.args:
-        img_url = request.args['image']
-    else:
-        img_url = 'https://raw.githubusercontent.com/AlissonSteffens/image-processing-api/master/demo/lenna.jpg'
-
-    if 'marker_size' in request.args:
-        marker_size = int(request.args['marker_size'])
-    else:
-        marker_size = 1
-
-    image = url_to_image(img_url)
-    faces = face_finder.find_faces(image,as_np = True)
-    marks = landmark_finder.find_simple_landmarks(image, faces,as_np = True)
-
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    for landmark in marks:
-        for x,y in landmark:
-            cv2.circle(image_rgb, (x, y), 1, (255, 255, 255), marker_size)
-
-    return send_file(serve_pil_image(image_rgb),mimetype='image/jpeg')  
-
 @app.route('/face-marks', methods=['GET'])
 def draw_face_marks():
     if 'image' in request.args:
@@ -239,13 +216,22 @@ def draw_face_marks():
 
     image = url_to_image(img_url)
     faces = face_finder.find_faces(image,as_np = True)
-    marks = landmark_finder.find_landmarks(image, faces,as_np = True)
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    xf,yf,wf,hf = faces[0]
+    marginx = int(wf/2)
+    marginy = int(hf/2)
+    crope = image[max(int(yf-marginy),0):min(int(yf+hf+marginy),image.shape[0]), max(int(xf-marginx),0):min(int(xf+wf+marginx),image.shape[1])]
+    marks = landmark_finder.find_landmarks(crope,as_np = True)
+    image_rgb = cv2.cvtColor(crope, cv2.COLOR_BGR2RGB)
+    
+    for i in range(len(marks)):
+            marks[i][0] = marks[i][0]*(image_rgb.shape[1]/192)
+            marks[i][1] = marks[i][1]*(image_rgb.shape[0]/192)
     
     for x,y,z in marks:
         pox = int(x)
-        poy=  int(y) 
-        cv2.circle(image_rgb, (pox, poy), 1, (255, 255, 255), marker_size)
+        poy =  int(y)
+        image_rgb[poy, pox] = (255, 255, 255)
+        # cv2.circle(image_rgb, (pox, poy), 1, (255, 255, 255), marker_size)
 
     return send_file(serve_pil_image(image_rgb),mimetype='image/jpeg')  
 
