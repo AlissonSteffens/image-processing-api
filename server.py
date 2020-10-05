@@ -63,6 +63,31 @@ def get_face():
     faces = face_finder.find_faces(image)
     return faces
 
+@app.route('/api/marks', methods=['GET'])
+def get_marks():
+    img_url = request.args['image']
+
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image,as_np = True)
+    xf,yf,wf,hf = faces[0]
+    marginx = int(wf/2)
+    marginy = int(hf/2)
+    crope = image[max(int(yf-marginy),0):min(int(yf+hf+marginy),image.shape[0]), max(int(xf-marginx),0):min(int(xf+wf+marginx),image.shape[1])]
+    marks = landmark_finder.find_landmarks(crope, offset=(max(int(xf-marginx),0),max(int(yf-marginy),0)))
+
+    return marks
+
+@app.route('/api/direction', methods=['GET'])
+def get_direction():
+    img_url = request.args['image']
+
+    image = url_to_image(img_url)
+    faces = face_finder.find_faces(image,as_np = True)
+    marks = landmark_finder.find_simple_landmarks(image, faces,as_np = True)
+    direction = focus_finder.find_direction(marks)
+
+    return direction
+
 @app.route('/face', methods=['GET'])
 def get_face_rect():
     if 'image' in request.args:
@@ -84,123 +109,6 @@ def get_face_rect():
         return send_file(serve_pil_image(final_image),mimetype='image/jpeg')
     else:
         return send_file(serve_pil_image(crop_img),mimetype='image/jpeg')
-    
-
-@app.route('/api/marks', methods=['GET'])
-def get_marks():
-    img_url = request.args['image']
-
-    image = url_to_image(img_url)
-   
-    faces = face_finder.find_faces(image,as_np = True)
-    marks = landmark_finder.find_landmarks(image, faces)
-
-    return marks
-
-@app.route('/api/simple-marks', methods=['GET'])
-def get_simp_marks():
-    img_url = request.args['image']
-
-    image = url_to_image(img_url)
-    faces = face_finder.find_faces(image,as_np = True)
-    marks = landmark_finder.find_simple_landmarks(image, faces)
-
-    return marks
-
-@app.route('/api/direction', methods=['GET'])
-def get_direction():
-    img_url = request.args['image']
-
-    image = url_to_image(img_url)
-    faces = face_finder.find_faces(image,as_np = True)
-    marks = landmark_finder.find_simple_landmarks(image, faces,as_np = True)
-    direction = focus_finder.find_direction(marks)
-
-    return direction
-
-
-@app.route('/simple-marks', methods=['GET'])
-def draw_simple_marks():
-    if 'image' in request.args:
-        img_url = request.args['image']
-    else:
-        img_url = 'https://raw.githubusercontent.com/AlissonSteffens/image-processing-api/master/demo/lenna.jpg'
-
-    if 'marker_size' in request.args:
-        marker_size = int(request.args['marker_size'])
-    else:
-        marker_size = 1
-
-    if 'image_size' in request.args:
-        image_size = int(request.args['image_size'])
-        resize = True
-    else:
-        resize = False
-
-    
-    image = url_to_image(img_url)
-    faces = face_finder.find_faces(image,as_np = True)
-    (xf,yf,wf,hf) = faces[0]
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    crop_img = np.zeros((int(wf*1.1),int(hf*1.1),3), np.uint8)
-
-
-    marks = landmark_finder.find_simple_landmarks(image, faces,as_np = True)
-
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    landmark = marks[0]
-    if resize:
-        marker_size = int(wf/(image_size/2))
-    for x,y in landmark:
-        cv2.circle(crop_img, (int(x-xf), int(y-yf)), 1, (255, 255, 255), marker_size)
-
-    if resize:
-        crop_img = cv2.resize(crop_img,(image_size,image_size))
-
-    return send_file(serve_pil_image(crop_img),mimetype='image/jpeg')
-
-
-@app.route('/marks', methods=['GET'])
-def draw_marks():
-    if 'image' in request.args:
-        img_url = request.args['image']
-    else:
-        img_url = 'https://raw.githubusercontent.com/AlissonSteffens/image-processing-api/master/demo/lenna.jpg'
-
-    if 'marker_size' in request.args:
-        marker_size = int(request.args['marker_size'])
-    else:
-        marker_size = 1
-
-    if 'image_size' in request.args:
-        image_size = int(request.args['image_size'])
-        resize = True
-    else:
-        resize = False
-
-    
-    image = url_to_image(img_url)
-    faces = face_finder.find_faces(image,as_np = True)
-    (xf,yf,wf,hf) = faces[0]
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    crop_img = np.zeros((int(image_rgb.shape[0]),int(image_rgb.shape[1]),3), np.uint8)
-
-
-    marks = landmark_finder.find_landmarks(image, faces,as_np = True)
-
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    landmark = marks
-    if resize:
-        marker_size = int(wf/(image_size/2))
-    for x,y,z in landmark:
-        cv2.circle(crop_img, (int(x), int(y)), 1, (255, 255, 255), marker_size)
-
-    if resize:
-        crop_img = cv2.resize(crop_img,(image_size,image_size))
-
-    return send_file(serve_pil_image(crop_img),mimetype='image/jpeg')
 
 @app.route('/face-marks', methods=['GET'])
 def draw_face_marks():
@@ -222,10 +130,6 @@ def draw_face_marks():
     crope = image[max(int(yf-marginy),0):min(int(yf+hf+marginy),image.shape[0]), max(int(xf-marginx),0):min(int(xf+wf+marginx),image.shape[1])]
     marks = landmark_finder.find_landmarks(crope,as_np = True)
     image_rgb = cv2.cvtColor(crope, cv2.COLOR_BGR2RGB)
-    
-    for i in range(len(marks)):
-            marks[i][0] = marks[i][0]*(image_rgb.shape[1]/192)
-            marks[i][1] = marks[i][1]*(image_rgb.shape[0]/192)
     
     for x,y,z in marks:
         pox = int(x)
