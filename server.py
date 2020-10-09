@@ -83,7 +83,11 @@ def get_direction():
 
     image = url_to_image(img_url)
     faces = face_finder.find_faces(image,as_np = True)
-    marks = landmark_finder.find_simple_landmarks(image, faces,as_np = True)
+    xf,yf,wf,hf = faces[0]
+    marginx = int(wf/2)
+    marginy = int(hf/2)
+    crope = image[max(int(yf-marginy),0):min(int(yf+hf+marginy),image.shape[0]), max(int(xf-marginx),0):min(int(xf+wf+marginx),image.shape[1])]
+    marks = landmark_finder.find_simple_landmarks(crope, as_np = True, offset=(max(int(xf-marginx),0),max(int(yf-marginy),0)))
     direction = focus_finder.find_direction(marks)
 
     return direction
