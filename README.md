@@ -47,7 +47,7 @@ To get a local copy up and running follow these simple steps.
 ### Prerequisites
 
 #### Running locally
-* Install de [dependencies](requirements.txt)
+* Install the [dependencies](requirements.txt)
 * Run ``` python server.py ``` 
 
 ## Usage
